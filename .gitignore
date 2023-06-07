@@ -2,3 +2,8 @@
 build
 install
 log
+*~
+*.cfgc
+*.pyc
+cfg/cpp
+docs
