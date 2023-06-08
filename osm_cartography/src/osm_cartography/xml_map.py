@@ -102,21 +102,14 @@ def get_tag(el):
 
 
 def get_osm(url, bounds):
-    """Get `geographic_msgs/GeographicMap`_ from Open Street Map XML data.
-
-    The latitude and longitude of the bounding box returned may differ
-    from the requested bounds.
-
-    :param url:    Uniform Resource Locator for map.
-    :param bounds: Desired `geographic_msgs/BoundingBox`_ for map (presently ignored).
-    :returns: `geographic_msgs/GeographicMap`_ message (header not filled in).
-    """
     # parse the URL
     if url.startswith('file:///'):
         filename = url[7:]
+        print("[INFO] xml_map get_osm file name from file : ", filename)
     elif url.startswith('package://'):
         pkg_name, slash, pkg_path = url[10:].partition('/')
         filename = SHARE_DIR + '/' + pkg_path
+        print("[INFO] xm_map get_osm file name from package : ", filename)
     else:
         raise ValueError('unsupported URL: ' + url)
 
