@@ -1,0 +1,11 @@
+Metadata-Version: 1.2
+Name: route-network
+Version: 0.2.5
+Summary: Route network graphing and path planning.
+Home-page: UNKNOWN
+Author: Jack O'Quin
+Maintainer: Jack O'Quin
+License: BSD
+Description: UNKNOWN
+Keywords: ROS2
+Platform: UNKNOWN

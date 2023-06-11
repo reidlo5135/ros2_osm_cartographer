@@ -1,0 +1,2 @@
+ros__parameters:
+  map_url: "/home/wavem/ros2_ws/src/ros2_osm_cartographer/osm_cartography/maps/ixtapa.osm"
