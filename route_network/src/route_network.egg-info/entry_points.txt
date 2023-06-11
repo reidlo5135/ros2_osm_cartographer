@@ -1,0 +1,7 @@
+[console_scripts]
+plan_route = route_network.nodes.plan_route:main
+route_network = route_network.nodes.route_network:main
+rviz_goal = route_network.nodes.rviz_goal:main
+viz_plan = route_network.nodes.viz_plan:main
+viz_routes = route_network.nodes.viz_routes:main
+

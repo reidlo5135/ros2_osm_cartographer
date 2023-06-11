@@ -33,7 +33,6 @@ class ServerNode(Node):
             resp.map.header.frame_id = '/map'
         return resp
 
-
 def main(args=None):
     rclpy.init(args=args)
     server = ServerNode()
@@ -45,7 +44,6 @@ def main(args=None):
 
     server.destroy_node()
     rclpy.shutdown()
-
 
 if __name__ == '__main__':
     main()

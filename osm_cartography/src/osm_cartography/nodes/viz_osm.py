@@ -18,14 +18,13 @@ import rclpy
 from rclpy.node import Node
 from rclpy.duration import Duration
 
-
 class VizNode(Node):
     def __init__(self):
         super().__init__("viz_osm")
 
-        map_url = self.declare_parameter("map_url").value
+        # map_url = self.declare_parameter("map_url").value
+        map_url = "file:///home/reidlo/ros2_ws/src/ros2_osm_cartographer/osm_cartography/tests/prc.osm"
 
-        # advertise visualization marker topic
         self.pub = self.create_publisher(MarkerArray, 'visualization_marker_array', 10)
 
         self.map = None
@@ -35,7 +34,6 @@ class VizNode(Node):
         while not self.get_map.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('service not available, waiting again...')
 
-        # refresh the markers every three seconds, making them last four.
         self.timer_interval = 3
         self.marker_life = rclpy.duration.Duration(seconds=self.timer_interval + 1).to_msg()
         self.timer = self.create_timer(self.timer_interval, self.timer_callback)
@@ -56,7 +54,6 @@ class VizNode(Node):
         self.mark_boundaries(ColorRGBA(r=0.5, g=0.5, b=0.5, a=0.8))
         self.mark_way_points(ColorRGBA(r=1., g=1., b=0., a=0.8))
 
-        # define arguments for displaying various feature types
         road_props = {'bridge', 'highway', 'tunnel'}
         fargs = [(lambda f: geodesy.props.match(f, road_props),
                   ColorRGBA(r=8., g=0.2, b=0.2, a=0.8),
@@ -74,7 +71,6 @@ class VizNode(Node):
             self.mark_features(*args)
 
     def mark_boundaries(self, color):
-        # draw outline of map boundaries
         marker = Marker(header=self.map.header,
                         ns="bounds_osm",
                         id=0,
@@ -84,8 +80,6 @@ class VizNode(Node):
                         color=color,
                         lifetime=self.marker_life)
 
-        # Convert bounds latitudes and longitudes to UTM (no
-        # altitude), convert UTM points to geometry_msgs/Point
         bbox = self.map.bounds
         min_lat, min_lon, max_lat, max_lon = bounding_box.getLatLong(bbox)
         p0 = geodesy.utm.fromLatLong(min_lat, min_lon).toPoint()
@@ -93,7 +87,6 @@ class VizNode(Node):
         p2 = geodesy.utm.fromLatLong(max_lat, max_lon).toPoint()
         p3 = geodesy.utm.fromLatLong(max_lat, min_lon).toPoint()
 
-        # add line strips to bounds marker
         marker.points.append(p0)
         marker.points.append(p1)
         marker.points.append(p1)
@@ -105,16 +98,6 @@ class VizNode(Node):
         self.msg.markers.append(marker)
 
     def mark_features(self, predicate, color, namespace):
-        """
-        Create outline for map features
-
-        :param predicate: function to match desired features
-        :param color: RGBA value
-        :param namespace: Rviz namespace.
-
-        :todo: differentiate properties for: highway, building,
-               bridge, tunnel, amenity, etc.
-        """
         index = 0
         for feature in filter(predicate, self.map.features):
             marker = Marker(header=self.map.header,
@@ -129,7 +112,7 @@ class VizNode(Node):
             prev_point = None
             for mbr in feature.components:
                 wu_point = self.map_points.get(str(mbr.uuid))
-                if wu_point:  # this component is a way point
+                if wu_point: 
                     p = wu_point.toPointXY()
                     if prev_point:
                         marker.points.append(prev_point)
@@ -138,10 +121,6 @@ class VizNode(Node):
             self.msg.markers.append(marker)
 
     def mark_way_points(self, color):
-        """Create slightly transparent disks for way-points.
-
-        :param color: disk RGBA value
-        """
         index = 0
         for wp in self.map_points:
             marker = Marker(header=self.map.header,
@@ -153,21 +132,17 @@ class VizNode(Node):
                             color=color,
                             lifetime=self.marker_life)
             index += 1
-            # use easting and northing coordinates (ignoring altitude)
+
             marker.pose.position = wp.toPointXY()
             marker.pose.orientation = Quaternion(x=0., y=0., z=0., w=1.)
             self.msg.markers.append(marker)
 
     def timer_callback(self):
-        """
-        Called periodically to refresh map visualization.
-        """
-        if self.msg is not None:
+       if self.msg is not None:
             now = self.get_clock().now().to_msg()
             for m in self.msg.markers:
                 m.header.stamp = now
             self.pub.publish(self.msg)
-
 
 def main(args=None):
     rclpy.init(args=args)
@@ -181,10 +156,9 @@ def main(args=None):
                     result = viznode.future.result()
                 except Exception as e:
                     viznode.get_logger().error(f"Service call failed: {e}")
-                else:  # get_map returned
+                else:
                     if result.success:
                         viznode.get_markers(result.map)
-                        # publish visualization markers (on a latched topic)
                         viznode.pub.publish(viznode.msg)
                     else:
                         print('get_geographic_map failed, status:', str(result.status))
@@ -194,7 +168,5 @@ def main(args=None):
     viznode.destroy_node()
     rclpy.shutdown()
 
-
 if __name__ == '__main__':
-    # run main function and exit
     sys.exit(main())

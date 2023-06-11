@@ -1,46 +1,3 @@
-#!/usr/bin/python
-# Software License Agreement (BSD License)
-#
-# Copyright (C) 2012, Jack O'Quin
-# All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-#  * Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#  * Redistributions in binary form must reproduce the above
-#    copyright notice, this list of conditions and the following
-#    disclaimer in the documentation and/or other materials provided
-#    with the distribution.
-#  * Neither the name of the author nor of other contributors may be
-#    used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id$
-
-"""
-Generate geographic information maps based on Open Street Map XML data.
-
-.. _`geographic_msgs/BoundingBox`: http://ros.org/doc/api/geographic_msgs/html/msg/BoundingBox.html
-.. _`geographic_msgs/GeographicMap`: http://ros.org/doc/api/geographic_msgs/html/msg/GeographicMap.html
-.. _`geographic_msgs/KeyValue`: http://ros.org/doc/api/geographic_msgs/html/msg/KeyValue.html
-
-"""
 import os
 import uuid
 
@@ -59,39 +16,18 @@ SHARE_DIR = os.path.join("share", PACKAGE_NAME)
 
 
 def get_required_attribute(el, key):
-    """
-    Get attribute key of element *el*.
-
-    :raises:  :exc:`ValueError` if key not found
-    """
     val = el.get(key)
     if val is None:
         raise ValueError('required attribute missing: ' + key)
     return val
 
-
 def make_osm_unique_id(namespace, el_id):
-    """
-    Make UUID message for *el_id* number in OSM sub-namespace *namespace*.
-
-    :param namespace: OSM sub-namespace
-    :type  namespace: string
-    :param el_id: OSM identifier within that namespace
-    :type  el_id: int or string containing an integer
-
-    :returns: corresponding `unique_identifier_msgs/UUID`_ message.
-    :raises:  :exc:`ValueError`
-    """
     if namespace not in {'node', 'way', 'relation'}:
         raise ValueError('invalid OSM namespace: ' + namespace)
     ns = 'http://openstreetmap.org/' + namespace + '/'
     return UUID(uuid=list(uuid.uuid5(uuid.NAMESPACE_URL, ns + str(el_id)).bytes))
 
-
 def get_tag(el):
-    """
-    :returns: `geographic_msgs/KeyValue`_ message for `<tag>` *el* if any, None otherwise.
-    """
     pair = None
     key = el.get('k')
     if key is not None:
@@ -100,9 +36,7 @@ def get_tag(el):
         pair.value = get_required_attribute(el, 'v')
         return pair
 
-
 def get_osm(url, bounds):
-    # parse the URL
     if url.startswith('file:///'):
         filename = url[7:]
         print("[INFO] xml_map get_osm file name from file : ", filename)
@@ -125,7 +59,6 @@ def get_osm(url, bounds):
         raise ValueError('XML parse failed for ' + str(url))
     osm = xm.getroot()
 
-    # get map bounds
     for el in osm.iterfind('bounds'):
         minlat = float(get_required_attribute(el, 'minlat'))
         minlon = float(get_required_attribute(el, 'minlon'))
@@ -133,7 +66,6 @@ def get_osm(url, bounds):
         maxlon = float(get_required_attribute(el, 'maxlon'))
         gmap.bounds = bounding_box.makeBounds2D(minlat, minlon, maxlat, maxlon)
 
-    # get map way-point nodes
     for el in osm.iterfind('node'):
 
         way = WayPoint()
@@ -153,7 +85,6 @@ def get_osm(url, bounds):
 
         gmap.points.append(way)
 
-    # get map paths
     for el in osm.iterfind('way'):
         feature = MapFeature()
         el_id = el.get('id')
@@ -172,7 +103,6 @@ def get_osm(url, bounds):
 
         gmap.features.append(feature)
 
-    # get relations
     for el in osm.iterfind('relation'):
 
         feature = MapFeature()
