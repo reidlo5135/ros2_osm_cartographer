@@ -6,7 +6,7 @@ from launch import LaunchDescription, LaunchIntrospector, LaunchService
 from launch_ros import actions
 
 def generate_launch_description():
-    map_url = "file://"+os.path.join(get_package_share_directory("osm_cartography"), "tests", "prc.osm")
+    map_url = "file://" + os.path.join(get_package_share_directory("osm_cartography"), "tests", "prc.osm")
 
     osm_server = actions.Node(
         package='osm_cartography', node_executable='osm_server', output='screen')

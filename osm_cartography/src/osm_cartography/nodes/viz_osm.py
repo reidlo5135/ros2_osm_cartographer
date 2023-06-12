@@ -22,8 +22,9 @@ class VizNode(Node):
     def __init__(self):
         super().__init__("viz_osm")
 
+        map_url = "file://" + self.declare_parameter("map_url").value
         # map_url = self.declare_parameter("map_url").value
-        map_url = "file:///home/reidlo/ros2_ws/src/ros2_osm_cartographer/osm_cartography/tests/prc.osm"
+        # map_url = "file:///home/wavem/ros2_ws/src/ros2_osm_cartographer/osm_cartography/tests/prc.osm"
 
         self.pub = self.create_publisher(MarkerArray, 'visualization_marker_array', 10)
 
