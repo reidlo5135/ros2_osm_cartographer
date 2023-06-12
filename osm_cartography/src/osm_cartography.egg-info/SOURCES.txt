@@ -26,3 +26,4 @@ tests/large-prc.osm
 tests/prc.osm
 tests/south-of-prc.osm
 tests/tiny.osm
+tests/viz_tower.osm
