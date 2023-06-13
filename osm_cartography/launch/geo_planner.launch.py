@@ -7,8 +7,10 @@ from launch_ros import actions
 
 def generate_launch_description():
     # map_url = os.path.join(get_package_share_directory("osm_cartography"), "tests", "viz_tower.osm")
-    map_url = os.path.join(get_package_share_directory("osm_cartography"), "tests", "songuo.osm")
+   # map_url = os.path.join(get_package_share_directory("osm_cartography"), "tests", "songuo.osm")
     # map_url = os.path.join(get_package_share_directory("osm_cartography"), "tests", "prc.osm")
+    map_url = os.path.join(get_package_share_directory("osm_cartography"), "tests", "seong_nam.osm")
+ 
     rviz_config_path = os.path.join(get_package_share_directory("osm_cartography"), "rviz", "geo_planner.rviz")
 
     osm_server = actions.Node(
@@ -50,7 +52,9 @@ def generate_launch_description():
         output='screen',
         # arguments=["622150", "3362350", "0", "0", "0", "0", "1", "map", "local_map"]
         # arguments=["317260", "4139992", "0", "0", "0", "0", "1", "map", "local_map"]
-        arguments=["332139", "4122350", "0", "0", "0", "0", "1", "map", "local_map"]
+        # arguments=["332139", "4122350", "0", "0", "0", "0", "1", "map", "local_map"]
+        arguments=["334011", "4147703", "0", "0", "0", "0", "1", "map", "local_map"]
+ 
     )
 
     rviz2 = actions.Node(
